@@ -120,7 +120,7 @@ Ortho4XP:
 		&& ln -snfr ../Ortho4XP.cfg ../Ortho4XP_noroads.cfg . \
 		&& ln -snfr ../build/Elevation_data ../build/Geotiffs ../build/Masks ../build/OSM_data ../build/Orthophotos . \
 		&& rm -rf Patches/ && ln -snfr ../Patches \
-		&& python3.12 -m venv .venv \
+		&& python3 -m venv .venv \
 		&& . .venv/bin/activate \
 		&& sed -i '/gdal/d' requirements.txt \
 		&& pip install gdal==$$(gdalinfo --version | cut -f 2 -d' ' | cut -f1 -d ',') \
