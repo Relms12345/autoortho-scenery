@@ -136,7 +136,8 @@ otv:
 	git clone --single-branch --branch develop https://github.com/jonaseberle/otv.git
 	@cd $@/ \
 		&& echo "$$(git remote get-url origin)|$$(git describe --tags --long)" > checked_by.template \
-		&& PIPENV_PIPFILE=./Pipfile PIPENV_IGNORE_VIRTUALENVS=1 pipenv install
+		&& PIPENV_PIPFILE=./Pipfile PIPENV_IGNORE_VIRTUALENVS=1 pipenv install \
+		&& pipenv install colorama
 
 
 #
