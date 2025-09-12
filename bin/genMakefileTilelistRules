@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 # Outputs Makefile rules for tilelists and a default all: target.
 # var/run/eur_tiles: build/Tiles/*/*/*/+51-010.dsf ...
 

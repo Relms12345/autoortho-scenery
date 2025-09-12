@@ -18,7 +18,7 @@
 # remove make builtin rules for more useful make -d 
 MAKEFLAGS += --no-builtin-rules
 MAKEFLAGS += --no-builtin-variables
-SHELL=/bin/bash
+SHELL=/bin/sh
 
 ZL?=16
 VARIANT?=o4xp1.40
@@ -74,6 +74,30 @@ statsdiff:
 	&& diff --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L' var/run/prevStats <(echo "$$new"); \
 	echo "$$new" > var/run/prevStats
 
+sort-rasters:
+	./bin/compare_files.sh xplane-rasters.txt antarctica_tiles antarctica_tiles.not-in-xplane-rasters
+	./bin/exclude_files.sh antarctica_tiles antarctica_tiles.not-in-xplane-rasters antarctica_tile_list
+
+	./bin/compare_files.sh xplane-rasters.txt eur_tiles eur_tiles.not-in-xplane-rasters
+	./bin/exclude_files.sh eur_tiles eur_tiles.not-in-xplane-rasters eur_tile_list
+
+	./bin/compare_files.sh xplane-rasters.txt greenland_tiles greenland_tiles.not-in-xplane-rasters
+	./bin/exclude_files.sh greenland_tiles greenland_tiles.not-in-xplane-rasters greenland_tile_list
+
+	./bin/compare_files.sh xplane-rasters.txt na_tiles na_tiles.not-in-xplane-rasters
+	./bin/exclude_files.sh na_tiles na_tiles.not-in-xplane-rasters na_tile_list
+
+	./bin/compare_files.sh antarctica_tile_list xplane-rasters.txt xplane-rasters.not-in-tilelist
+
+	./bin/compare_files.sh eur_tile_list xplane-rasters.not-in-tilelist xplane-rasters.not-in-tilelist.new
+	mv xplane-rasters.not-in-tilelist.new xplane-rasters.not-in-tilelist
+
+	./bin/compare_files.sh greenland_tile_list xplane-rasters.not-in-tilelist xplane-rasters.not-in-tilelist.new
+	mv xplane-rasters.not-in-tilelist.new xplane-rasters.not-in-tilelist
+
+	./bin/compare_files.sh na_tile_list xplane-rasters.not-in-tilelist xplane-rasters.not-in-tilelist.new
+	mv xplane-rasters.not-in-tilelist.new xplane-rasters.not-in-tilelist
+
 # creates directories
 %/:
 	@echo "[$@]"
@@ -119,7 +143,7 @@ Ortho4XP:
 		&& echo "$$(git remote get-url origin)|$$(git describe --tags --long)" > generated_by.template \
 		&& ln -snfr ../Ortho4XP.cfg ../Ortho4XP_noroads.cfg . \
 		&& ln -snfr ../build/Elevation_data ../build/Geotiffs ../build/Masks ../build/OSM_data ../build/Orthophotos . \
-		&& python3.12 -m venv .venv \
+		&& python3 -m venv .venv \
 		&& . .venv/bin/activate \
 		&& sed -i '/gdal/d' requirements.txt \
 		&& pip install numpy==1.26.4 wheel setuptools --no-cache --force-reinstall \
