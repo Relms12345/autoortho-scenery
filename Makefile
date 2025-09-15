@@ -141,7 +141,7 @@ Ortho4XP:
 	@mkdir -p build/Elevation_data/ build/Geotiffs/ build/Masks/ build/OSM_data/ build/Orthophotos build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)
 	@set -x && cd $@/ \
 		&& echo "$$(git remote get-url origin)|$$(git describe --tags --long)" > generated_by.template \
-		&& ln -snfr ../Ortho4XP.cfg ../Ortho4XP_noroads.cfg . \
+		&& ln -snfr ../Ortho4XP.cfg ../Ortho4XP_noroads.cfg ../Ortho4XP_no_minangle.cfg . \
 		&& ln -snfr ../build/Elevation_data ../build/Geotiffs ../build/Masks ../build/OSM_data ../build/Orthophotos . \
 		&& python3 -m venv .venv \
 		&& . .venv/bin/activate \
@@ -195,7 +195,18 @@ build/Tiles/zl$(ZL)/o4xp1.40/v$(VERSION)/zOrtho4XP_%/_docs/generated_by_*.txt: O
 		&& [ -e "$(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Earth nav data/"*/$*.dsf ] \
 		&& cp generated_by.template $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/_docs/generated_by_$*.txt; \
 	[ -e "$(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Earth nav data/"*/$*.dsf ] || ( \
-		echo "ERROR DETECTED! Retry tile $@ with noroads config."; \
+                echo "ERROR DETECTED! Retry tile $@ with no_minangle config."; \
+                cd $(CURDIR)/Ortho4XP \
+                        && cp Ortho4XP_no_minangle.cfg $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Ortho4XP_$*.cfg \
+                        && sed -i "/^default_zl=/s/=.*/=$(ZL)/" $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Ortho4XP_$*.cfg \
+                        && ln -snfr ../build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION) ./Tiles \
+                        && . .venv/bin/activate \
+                        && python3 Ortho4XP.py $$COORDS 2>&1 \
+                        && [ -e "$(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Earth nav data/"*/$*.dsf ] \
+                        && cp generated_by.template $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/_docs/generated_by_$*.txt \
+        ); \
+	[ -e "$(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Earth nav data/"*/$*.dsf ] || ( \
+		echo "ERROR DETECTED! Retry tile $@ with noroads & no_minangle config."; \
 		cd $(CURDIR)/Ortho4XP \
 			&& cp Ortho4XP_noroads.cfg $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Ortho4XP_$*.cfg \
 			&& sed -i "/^default_zl=/s/=.*/=$(ZL)/" $(CURDIR)/build/Tiles/zl$(ZL)/$(VARIANT)/v$(VERSION)/zOrtho4XP_$*/Ortho4XP_$*.cfg \
